@@ -1,0 +1,77 @@
+const synth = window.speechSynthesis;
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+const btn = document.querySelector('.talk');
+const content = document.querySelector('.content');
+
+// Comprehensive BEL-related queries
+const userMessage = [
+  
+];
+
+// Comprehensive BEL-related bot replies
+const botReply = [
+  
+];
+
+// Alternative responses for unknown queries
+const alternative = [
+  
+];
+
+function speak(text) {
+    const text_speak = new SpeechSynthesisUtterance(text);
+    text_speak.rate = 1;
+    text_speak.volume = 1;
+    text_speak.pitch = 1;
+    synth.speak(text_speak);
+}
+
+function wishMe() {
+    var day = new Date();
+    var hour = day.getHours();
+
+    if (hour >= 0 && hour < 12) {
+        speak("Good Morning...");
+    } else if (hour >= 12 && hour < 17) {
+        speak("Good Afternoon...");
+    } else {
+        speak("Good Evening...");
+    }
+}
+
+window.addEventListener('load', () => {
+    speak("Initializing BEL Assistant...");
+    wishMe();
+});
+
+function getBotReply(input) {
+    let text = input.toLowerCase().replace(/[^\w\s\d]/gi, "").trim();
+    let response = compare(userMessage, botReply, text);
+    return response ? response : alternative[Math.floor(Math.random() * alternative.length)];
+}
+
+function compare(userMessageArray, botReplyArray, string) {
+    for (let i = 0; i < userMessageArray.length; i++) {
+        if (userMessageArray[i].includes(string)) {
+            let replies = botReplyArray[i];
+            return replies[Math.floor(Math.random() * replies.length)];
+        }
+    }
+    return null;
+}
+
+recognition.onresult = (event) => {
+    const currentIndex = event.resultIndex;
+    const transcript = event.results[currentIndex][0].transcript.toLowerCase();
+    content.textContent = transcript;
+    takeCommand(transcript);
+};
+
+btn.addEventListener('click', () => {
+    content.textContent = "Listening...";
+    recognition.start();
+});
+
+function takeCommand(message) {
+    if (message
